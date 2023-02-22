@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Productos</title>
+
+  <link rel="stylesheet" href="/base.css">
+</head>
+
+<body>
+  <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+
+  <h1>Listado de Productos</h1>
+  <a class="button" th:if="${isAdmin}" href="/product/new">Nuevo Producto</a>
+
+  <table class="fl-table">
+    <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Precio</th>
+      <th>Cantidad</th>
+      <th th:if="${isAdmin}">Acciones</th>
+      <th th:if="${isAdmin == false}"></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${products}">
+      <td th:text="${p.getName()}"></td>
+      <td th:text="${p.getPrice()}"></td>
+      <td>
+        <form action="/add-to-cart" method="post">
+          <input type="hidden" name="id" th:value="${p.getId()}">
+          <input type="number" name="cant" min="1" value="1">
+          <button type="submit">Agregar al Carrito</button>
+        </form>
+      </td>
+      <td>
+        <form th:if="${isAdmin}" action="/product/edit" method="get">
+          <input type="hidden" name="id" th:value="${p.getId()}">
+          <button type="submit">Editar</button>
+        </form>
+      </td>
+      <td>
+        <form th:if="${isAdmin}" action="/product/delete" method="post">
+          <input type="hidden" name="id" th:value="${p.getId()}">
+          <button type="submit">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</body>
+
+</html>

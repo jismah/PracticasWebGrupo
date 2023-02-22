@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Usuarios</title>
+  <link rel="stylesheet" href="/base.css">
+</head>
+
+<body>
+<div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+
+<h1>Listado de Usuarios</h1>
+<a class="button" href="/user/new">Nuevo Usuario</a>
+<table class="fl-table">
+  <thead>
+  <tr>
+    <th>Nombre</th>
+    <th>Username</th>
+    <th></th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="u : ${users}">
+    <td th:text="${u.getName()}"></td>
+    <td th:text="${u.getUsername()}"></td>
+
+    <td>
+      <form action="/user/edit" method="get">
+        <input type="hidden" name="username" th:value="${u.getUsername()}">
+        <button type="submit">Editar</button>
+      </form>
+    </td>
+
+    <td>
+      <form action="/user/delete" method="post">
+        <input type="hidden" name="username" th:value="${u.getUsername()}">
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+
+  </tr>
+  </tbody>
+</table>
+
+</body>
+
+</html>

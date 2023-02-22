@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title th:if="${user == null}">Nuevo Usuario</title>
+  <title th:if="${user != null}">Editar Usuario</title>
+  <link rel="stylesheet" href="/base.css">
+</head>
+<body>
+<div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+
+<form th:if="${user == null}" action="/user/new" method="post">
+  Nombre: <input type="text" name="name" required/><br/>
+  Usuario: <input type="text" name="username" required/><br>
+  Password: <input type="password" name="password" required/><br/>
+  <input type="submit" value="Registrar"/>
+</form>
+<form th:if="${user != null}" action="/user/edit" method="post">
+  <input type="hidden" name="old" th:value="${user.getUsername()}">
+  Nombre: <input type="text" name="name" th:value="${user.getName()}" required/><br/>
+  Usuario: <input type="text" name="username" th:value="${user.getUsername()}" required/><br>
+  Password: <input type="password" name="password" th:value="${user.getPassword()}" required/><br/>
+  <input type="submit" value="Editar"/>
+</form>
+
+</body>
+</html>

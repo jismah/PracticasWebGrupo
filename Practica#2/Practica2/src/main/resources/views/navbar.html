@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Navbar</title>
+
+</head>
+<body>
+<nav th:fragment="navbar">
+  <div th:if="${isAdmin == false}" class="nav-container">
+    <div class="navMenu">
+      <a href="/products">Productos</a>
+      <a href="/cart">Carrito</a>
+      <a th:if="${isLogged == false}" href="/login">Login</a>
+      <a th:if="${isLogged}" href="/logout">Logout</a>
+      <div class="dot"></div>
+    </div>
+    <span class="cart-items" th:text="${'Items en carrito: '+ itemCount}">Items en carrito: 0</span>
+  </div>
+  <div th:if="${isAdmin}" class="nav-container">
+  <div class="navMenu">
+    <a href="/products">Productos</a>
+    <a href="/users">Usuarios</a>
+    <a href="/sales">Ventas</a>
+    <a href="/cart">Carrito</a>
+    <a href="/logout">Logout</a>
+    <div class="dot"></div>
+  </div>
+    <span class="cart-items" th:text="${'Items en carrito: '+ itemCount}">Items en carrito: 0</span>
+  </div>
+</nav>
+</body>
+</html>

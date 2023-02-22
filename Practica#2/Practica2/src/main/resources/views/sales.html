@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ventas</title>
+  <link rel="stylesheet" href="/base.css">
+</head>
+<body>
+<div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+
+<h1>Ventas</h1>
+  <div>
+    <div style="margin-top: 20px;" th:each="sale : ${sales}">
+      <h4 th:text="${'Cliente: ' + sale.getClientName()}"></h4>
+      <h4 th:text="${'Fecha: ' + sale.getDateSale()}"></h4>
+      <table class="fl-table">
+        <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${sale.getProducts()}">
+          <td th:text="${p.getName()}"></td>
+          <td th:text="${p.getPrice()}"></td>
+          <td th:text="${'x' + sale.getSales().getOrDefault(p.getId(), 'Error')}"></td>
+        </tr>
+        </tbody>
+      </table>
+      <h4 th:text="${'Total: ' + sale.getTotal()}"></h4>
+    </div>
+  </div>
+</body>
+</html>

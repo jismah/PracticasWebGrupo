@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Información</title>
+    <link rel="stylesheet" href="/base.css">
+</head>
+<body>
+  <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+
+  <p th:text="${message}">No hay mensaje que mostrar</p>
+  <a class="button" th:if="${return != null}" th:href="${return}">Regresar</a>
+</body>
+</html>
