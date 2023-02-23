@@ -1,12 +1,12 @@
 package org.jismah.controladores;
+
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import io.javalin.http.staticfiles.Location;
-import io.javalin.rendering.template.JavalinThymeleaf;
 import io.javalin.rendering.JavalinRenderer;
-import org.jismah.entidades.User;
+import io.javalin.rendering.template.JavalinThymeleaf;
 import org.jismah.Core;
+import org.jismah.entidades.User;
 import org.jismah.util.BaseHandler;
 
 import java.math.BigDecimal;
