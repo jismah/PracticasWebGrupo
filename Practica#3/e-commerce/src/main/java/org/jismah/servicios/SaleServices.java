@@ -17,6 +17,9 @@ public class SaleServices extends GestionBD<Sale> {
     }
 
     public static SaleServices getInstance() {
+        if (instance == null) {
+            instance = new SaleServices();
+        }
         return instance;
     }
 
@@ -27,6 +30,6 @@ public class SaleServices extends GestionBD<Sale> {
     public List<Sale> getSales() {
         EntityManager em = getEntityManager();
         Query query = em.createNativeQuery("select * from Sale", Sale.class);
-        return query.getResultList();
+        return (List<Sale>) query.getResultList();
     }
 }
