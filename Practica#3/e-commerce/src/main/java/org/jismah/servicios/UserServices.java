@@ -23,8 +23,8 @@ public class UserServices extends GestionBD<User> {
 
     public List<User> getAllUsers() {
         EntityManager em = getEntityManager();
-        Query query = em.createNativeQuery("select * from User ", User.class);
-        return query.getResultList();
+        Query query = em.createNativeQuery("select * from Usuario", User.class);
+        return (List<User>) query.getResultList();
     }
 
     public void newUser(String username, String name, String password) {
@@ -33,11 +33,10 @@ public class UserServices extends GestionBD<User> {
 
     public User getUserByUsername(String username) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("select user from User user where user.username = :username");
+        Query query = em.createQuery("select user from Usuario user where user.username = :username");
         query.setParameter("username", username);
         try {
-            User user = (User) query.getSingleResult();
-            return user;
+            return (User) query.getSingleResult();
         } catch (NoResultException e) {
             return null;
         }
