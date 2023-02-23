@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/base.css">
+</head>
+<body>
+<div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+
+<div>
+    <form action="/login" method="post">
+        Usuario: <input type="text" name="username" required/><br>
+        Password: <input type="password" name="password" required/><br/>
+        <input type="submit" value="Enviar"/>
+    </form>
+</div>
+
+<div>
+    <a class="button" href="/user/new">Nuevo Usuario</a>
+</div>
+
+</body>
+</html>
