@@ -3,12 +3,14 @@ package org.jismah;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.jismah.controladores.TemplateHandler;
+import org.jismah.servicios.BootStrapServices;
 
 public class Main {
 
-
-
     public static void main(String[] args) {
+
+        BootStrapServices.getInstance().init();
+
         var app = Javalin.create(javalinConfig -> {
                     javalinConfig.staticFiles.add( staticFileConfig -> {
                         staticFileConfig.hostedPath = "/";

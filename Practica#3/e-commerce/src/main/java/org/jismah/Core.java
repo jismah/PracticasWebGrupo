@@ -4,6 +4,9 @@ import org.jismah.entidades.Cart;
 import org.jismah.entidades.Product;
 import org.jismah.entidades.Sale;
 import org.jismah.entidades.User;
+import org.jismah.servicios.ProductServices;
+import org.jismah.servicios.SaleServices;
+import org.jismah.servicios.UserServices;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -29,61 +32,30 @@ public class Core {
         return instance;
     }
 
-    public Product addProduct(String name, BigDecimal price) {
-        Product product = new Product(name, price);
-        products.add(product);
-        return product;
+    // Manejo de Usuarios
+    public void addUser(String username, String name, String password) {
+        UserServices.getInstance().newUser(username, name, password);
     }
 
-    public void editProduct(UUID id, String name, BigDecimal price) {
-        Product product = getProductById(id);
-        if (product != null) {
-            product.setName(name);
-            product.setPrice(price);
-        } else {
-            System.out.print("No se encontro el producto con id: " + id.toString());
-        }
+    public void editUser(String old, String username, String name, String password) {
+        User user = getUserByUsername(old);
+        user.setName(name);
+        user.setPassword(password);
+        user.setUsername(username);
+
+        UserServices.getInstance().edit(user);
     }
 
-    public User addUser(String username, String name, String password) {
-        User user = new User(username, name, password);
-        users.add(user);
-        return user;
+    public List<User> getAllUsers() {
+        return UserServices.getInstance().getAllUsers();
     }
 
     public void deleteUser(User user) {
-        users.remove(user);
-    }
-
-    public Product getProductById(UUID id) {
-        for (Product product : products) {
-            if (product.getId().equals(id)) {
-                return product;
-            }
-        }
-        return null;
-    }
-
-    public Product getProductByName(String name) {
-        for (Product product : products) {
-            if (product.getName().equals(name)) {
-                return product;
-            }
-        }
-        return null;
-    }
-
-    public void deleteProduct(Product product) {
-        products.remove(product);
+        UserServices.getInstance().delete(user);
     }
 
     public User getUserByUsername(String username) {
-        for (User user : users) {
-            if (user.getUsername().equals(username)) {
-                return user;
-            }
-        }
-        return null;
+        return UserServices.getInstance().getUserByUsername(username);
     }
 
     public boolean authenticateUser(String username, String password) {
@@ -97,10 +69,50 @@ public class Core {
         return false;
     }
 
-    public List<Product> getAllProducts() {
-        return products;
+
+    //Manejo de Productos
+    public void addProduct(String name, BigDecimal price) {
+        ProductServices.getInstance().newProduct(name, price);
     }
 
+    public void editProduct(UUID id, String name, BigDecimal price) {
+        Product product = getProductById(id);
+        if (product != null) {
+            product.setName(name);
+            product.setPrice(price);
+
+            ProductServices.getInstance().edit(product);
+        } else {
+            System.out.print("No se encontro el producto con id: " + id.toString());
+        }
+    }
+    public Product getProductById(UUID id) {
+        return ProductServices.getInstance().getProductById(id);
+    }
+
+    public Product getProductByName(String name) {
+        return ProductServices.getInstance().getProductByName(name);
+    }
+
+    public void deleteProduct(Product product) {
+        ProductServices.getInstance().delete(product);
+    }
+
+    public List<Product> getAllProducts() {
+        return ProductServices.getInstance().getAllProducts();
+    }
+
+    // Manejo de Ventas
+    public void newSale(String sessionId, String clientName) {
+        Cart cart = getCartForSession(sessionId);
+        SaleServices.getInstance().newSale(clientName,cart.getItems());
+    }
+
+    public List<Sale> getSales() {
+        return SaleServices.getInstance().getSales();
+    }
+
+    // Manejo de carrito
     public Cart getCartForSession(String sessionId) {
         if (!carts.containsKey(sessionId)) {
             carts.put(sessionId, new Cart());
@@ -150,26 +162,6 @@ public class Core {
     public void clearCartBySession(String sessionId) {
         Cart cart = getCartForSession(sessionId);
         cart.clearCart();
-    }
-
-    public void newSale(String sessionId, String clientName) {
-        Cart cart = getCartForSession(sessionId);
-        sales.add(new Sale(clientName, cart.getItems()));
-    }
-
-    public List<Sale> getSales() {
-        return sales;
-    }
-
-    public void editUser(String old, String username, String name, String password) {
-        User user = getUserByUsername(old);
-        user.setName(name);
-        user.setPassword(password);
-        user.setUsername(username);
-    }
-
-    public List<User> getAllUsers() {
-        return users;
     }
 
 }

@@ -1,57 +1,55 @@
 package org.jismah.entidades;
 
+import jakarta.persistence.*;
 import org.jismah.Core;
-import org.thymeleaf.context.IContext;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class Sale {
+@Entity
+public class Sale implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Date dateSale;
     private String clientName;
-    private Map<UUID, Integer> sales;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "sale_item_fk")
+    private List<SaleItem> sales;
 
-    public Sale(String clientName) {
-        this.dateSale = new Date();
-        this.clientName = clientName;
-        this.sales = new HashMap<>();
-    }
+    public Sale() {}
 
     public Sale(String clientName, Map<UUID, Integer> items) {
         this.dateSale = new Date();
         this.clientName = clientName;
-        this.sales = new HashMap<>();
+        this.sales = new ArrayList<>();
 
         for (Map.Entry<UUID, Integer> entry : items.entrySet()) {
-            addItem(entry.getKey(), entry.getValue());
+            UUID productId = entry.getKey();
+            int quantity = entry.getValue();
+            Product product = Core.getInstance().getProductById(productId);
+            if (product != null) {
+                SaleItem item = new SaleItem(product.getId(), product.getName(), product.getPrice(), quantity);
+                addItem(item);
+            }
         }
     }
 
-    public List<Product> getProducts() {
-        List<Product> products = new ArrayList<>();
-        for (UUID id : sales.keySet()) {
-            Product p = Core.getInstance().getProductById(id);
-            if (p != null) {
-                products.add(p);
-            }
-        }
-        return products;
+    public List<SaleItem> getSales() {
+        return sales;
     }
 
     public BigDecimal getTotal() {
-        BigDecimal total = BigDecimal.valueOf(0.00);
-        Product product;
-        for (Map.Entry<UUID,Integer> item: sales.entrySet()) {
-            product = Core.getInstance().getProductById(item.getKey());
-            if (product != null) {
-                total = total.add(product.getPrice().multiply(BigDecimal.valueOf(item.getValue())));
-            }
+        BigDecimal total = BigDecimal.ZERO;
+        for (SaleItem item : sales) {
+            total = total.add(item.getSubtotal());
         }
         return total;
     }
 
-    public void addItem(UUID id, int cant) {
-        sales.put(id, cant);
+    public void addItem(SaleItem item) {
+        sales.add(item);
     }
 
     public Date getDateSale() {
@@ -62,7 +60,11 @@ public class Sale {
         return clientName;
     }
 
-    public Map<UUID, Integer> getSales() {
-        return sales;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
