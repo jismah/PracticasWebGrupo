@@ -11,17 +11,22 @@
 <body>
 <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
 
-<div>
+<div class="d-flex justify-content-center mt-3">
     <form action="/login" method="post">
-        Usuario: <input type="text" name="username" required/><br>
-        Password: <input type="password" name="password" required/><br/>
-        <input type="submit" value="Enviar"/>
+        <div class="mb-3">
+            <label for="username" class="form-label">Usuario</label>
+            <input class="form-control" id="username" type="text" name="username" required/>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Contrase&ntilde;a</label>
+            <input class="form-control" id="password" type="password" name="password" required/>
+        </div>
+        <input class="btn btn-dark" type="submit" value="Enviar"/>
+        <a class="btn" href="/user/new">Nuevo Usuario</a>
     </form>
 </div>
 
-<div>
-    <a class="button" href="/user/new">Nuevo Usuario</a>
-</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
