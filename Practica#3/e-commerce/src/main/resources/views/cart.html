@@ -13,9 +13,9 @@
 <body>
 <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
 <div class="container-fluid px-5 pt-3">
-    <div class="d-flex align-items-center mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="title-module me-3">Carrito de Compras</h1>
-        <a class="btn btn-dark" href="/products">Continuar comprando</a>
+        <a class="btn btn-outline-primary" href="/products">Continuar comprando</a>
     </div>
 
     <div class="container-datatable">

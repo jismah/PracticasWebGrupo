@@ -14,9 +14,9 @@
 <body>
 <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
 <div class="container-fluid px-5 pt-3">
-    <div class="d-flex align-items-center mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="title-module">Listado de Productos</h1>
-        <a class="btn btn-dark" th:if="${isAdmin}" href="/product/new">Nuevo Producto</a>
+        <a class="ms-3 btn btn-outline-dark" th:if="${isAdmin}" href="/product/new">Nuevo Producto</a>
     </div>
 
     <div class="container-datatable">
