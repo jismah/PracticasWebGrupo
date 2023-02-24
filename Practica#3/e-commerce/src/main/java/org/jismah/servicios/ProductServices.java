@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import org.jismah.entidades.Product;
+import org.jismah.entidades.ProductImage;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,8 +33,7 @@ public class ProductServices extends GestionBD<Product> {
         Query query = em.createQuery("select p from Product p where p.id = :id");
         query.setParameter("id", id);
         try {
-            Product product = (Product) query.getSingleResult();
-            return product;
+            return (Product) query.getSingleResult();
         } catch (NoResultException e) {
             return null;
         }
@@ -44,8 +44,7 @@ public class ProductServices extends GestionBD<Product> {
         Query query = em.createQuery("select p from Product p where p.name = :name");
         query.setParameter("name", name);
         try {
-            Product product = (Product) query.getSingleResult();
-            return product;
+            return (Product) query.getSingleResult();
         } catch (NoResultException e) {
             return null;
         }
@@ -55,5 +54,10 @@ public class ProductServices extends GestionBD<Product> {
         EntityManager em = getEntityManager();
         Query query = em.createNativeQuery("select * from Product ", Product.class);
         return query.getResultList();
+    }
+
+    public void addImageToProduct(UUID id, String mimeType, String image) {
+        Product product = getProductById(id);
+        product.addImage(new ProductImage(mimeType, image));
     }
 }

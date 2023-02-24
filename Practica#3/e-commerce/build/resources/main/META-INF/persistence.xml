@@ -6,6 +6,7 @@
         <class>org.jismah.entidades.User</class>
         <class>org.jismah.entidades.Sale</class>
         <class>org.jismah.entidades.SaleItem</class>
+        <class>org.jismah.entidades.ProductImage</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/ormjpa" />
@@ -15,7 +16,7 @@
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
             <property name="hibernate.show_sql" value="true"/>
 
-            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
         </properties>
     </persistence-unit>
 </persistence>
