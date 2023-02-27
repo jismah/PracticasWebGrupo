@@ -43,12 +43,16 @@ public class Cart {
         Product product;
         for (Map.Entry<UUID,Integer> item: items.entrySet()) {
             product = Core.getInstance().getProductById(item.getKey());
-            total = total.add(product.getPrice().multiply(BigDecimal.valueOf(item.getValue())));
+            if (product != null) {
+                total = total.add(product.getPrice().multiply(BigDecimal.valueOf(item.getValue())));
+            }
         }
         return total;
     }
 
     public Integer getItemCount() {
+        updateCart();
+
         Integer total = 0;
         for (Integer count : items.values()) {
             total += count;
@@ -58,5 +62,14 @@ public class Cart {
 
     public void clearCart() {
         items.clear();
+    }
+
+    public void updateCart() {
+        for (Map.Entry<UUID,Integer> item : items.entrySet()) {
+            Product product = Core.getInstance().getProductById(item.getKey());
+            if (product == null) {
+                items.remove(item.getKey());
+            }
+        }
     }
 }

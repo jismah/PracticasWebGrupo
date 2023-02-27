@@ -51,7 +51,7 @@ public class Core {
     }
 
     public void deleteUser(User user) {
-        UserServices.getInstance().delete(user);
+        UserServices.getInstance().delete(user.getId());
     }
 
     public User getUserByUsername(String username) {
@@ -71,15 +71,16 @@ public class Core {
 
 
     //Manejo de Productos
-    public void addProduct(String name, BigDecimal price) {
-        ProductServices.getInstance().newProduct(name, price);
+    public void addProduct(String name, BigDecimal price, String description) {
+        ProductServices.getInstance().newProduct(name, price, description);
     }
 
-    public void editProduct(UUID id, String name, BigDecimal price) {
+    public void editProduct(UUID id, String name, BigDecimal price, String description) {
         Product product = getProductById(id);
         if (product != null) {
             product.setName(name);
             product.setPrice(price);
+            product.setDescription(description);
 
             ProductServices.getInstance().edit(product);
         } else {
@@ -95,7 +96,7 @@ public class Core {
     }
 
     public void deleteProduct(Product product) {
-        ProductServices.getInstance().delete(product);
+        ProductServices.getInstance().delete(product.getId());
     }
 
     public List<Product> getAllProducts() {

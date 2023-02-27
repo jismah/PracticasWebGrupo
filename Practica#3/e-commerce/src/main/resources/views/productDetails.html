@@ -12,12 +12,16 @@
 <form th:if="${product == null}" action="/product/new" method="post">
     Nombre: <input type="text" name="name" required/><br>
     Precio: <input type="number" name="price" min="0" step="any"required/><br/>
+    Descripción: <textarea name="description"></textarea><br/>
+    Imagenes: <input type="file" name="images" multiple required><br/>
     <input type="submit" value="Crear"/>
 </form>
 <form th:if="${product != null}" action="/product/edit" method="post">
     <input type="hidden" name="id" th:value="${product.getId()}">
     Nombre: <input type="text" name="name" th:value="${product.getName()}" required/><br>
     Precio: <input type="number" name="price" min="0" step="any" th:value="${product.getPrice()}" required/><br/>
+    Descripción: <textarea name="description" th:text="${product.getDescription()}"></textarea><br/>
+    Imagenes: <input type="file" name="images" multiple><br/>
     <input type="submit" value="Editar"/>
 </form>
 

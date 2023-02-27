@@ -22,15 +22,6 @@ public class Product implements Serializable {
 
     public Product() {}
 
-    // Old constructor
-    public Product(String name, BigDecimal price) {
-        this.name = name;
-        this.price = price;
-        this.id = UUID.randomUUID();
-        this.description = "";
-        this.images = new ArrayList<>();
-    }
-
     public Product(String name, BigDecimal price, String description) {
         this.name = name;
         this.price = price;
@@ -79,4 +70,7 @@ public class Product implements Serializable {
         this.images = images;
     }
 
+    public void removeImages() {
+        images.clear();
+    }
 }

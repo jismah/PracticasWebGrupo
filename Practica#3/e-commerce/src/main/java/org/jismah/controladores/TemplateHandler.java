@@ -6,10 +6,14 @@ import io.javalin.http.Handler;
 import io.javalin.rendering.JavalinRenderer;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import org.jismah.Core;
+import org.jismah.entidades.Product;
 import org.jismah.entidades.User;
+import org.jismah.servicios.ProductServices;
 import org.jismah.util.BaseHandler;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -262,6 +266,7 @@ public class TemplateHandler extends BaseHandler {
                 public void handle(Context ctx) throws Exception {
                     String name = ctx.formParam("name");
                     BigDecimal price = new BigDecimal(ctx.formParam("price"));
+                    String description = ctx.formParam("description");
 
                     if (Core.getInstance().getProductByName(name) != null) {
                         ctx.status(401);
@@ -272,7 +277,16 @@ public class TemplateHandler extends BaseHandler {
                         model.put("return", "/product/new");
                         ctx.render("/views/messages.html", model);
                     } else {
-                        Core.getInstance().addProduct(name, price);
+                        Product product = ProductServices.getInstance().newProduct(name, price, description);
+                        ctx.uploadedFiles("images").forEach(uploadedFile -> {
+                            try {
+                                byte[] bytes = uploadedFile.content().readAllBytes();
+                                String encodedString = Base64.getEncoder().encodeToString(bytes);
+                                ProductServices.getInstance().addImageToProduct(product.getId(), uploadedFile.contentType(), encodedString);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
                         ctx.redirect("/products");
                     }
                 }
@@ -297,8 +311,22 @@ public class TemplateHandler extends BaseHandler {
                     UUID id = UUID.fromString(ctx.formParam("id"));
                     String name = ctx.formParam("name");
                     BigDecimal price = new BigDecimal(ctx.formParam("price"));
+                    String description = ctx.formParam("description");
 
-                    Core.getInstance().editProduct(id, name, price);
+                    if (ctx.uploadedFiles("images").size() > 0) {
+                        ProductServices.getInstance().removeImagesFromProduct(id);
+                        ctx.uploadedFiles("images").forEach(uploadedFile -> {
+                            try {
+                                byte[] bytes = uploadedFile.content().readAllBytes();
+                                String encodedString = Base64.getEncoder().encodeToString(bytes);
+                                ProductServices.getInstance().addImageToProduct(id, uploadedFile.contentType(), encodedString);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
+
+                    Core.getInstance().editProduct(id, name, price, description);
                     ctx.redirect("/products");
                 }
             });

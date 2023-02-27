@@ -24,8 +24,10 @@ public class ProductServices extends GestionBD<Product> {
         return  instance;
     }
 
-    public void newProduct(String name, BigDecimal price) {
-        create(new Product(name, price));
+    public Product newProduct(String name, BigDecimal price, String description) {
+        Product product = new Product(name, price, description);
+        create(product);
+        return product;
     }
 
     public Product getProductById(UUID id) {
@@ -59,5 +61,10 @@ public class ProductServices extends GestionBD<Product> {
     public void addImageToProduct(UUID id, String mimeType, String image) {
         Product product = getProductById(id);
         product.addImage(new ProductImage(mimeType, image));
+    }
+
+    public void removeImagesFromProduct(UUID id) {
+        Product product = getProductById(id);
+        product.removeImages();
     }
 }
