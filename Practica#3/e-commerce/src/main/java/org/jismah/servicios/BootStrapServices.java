@@ -1,8 +1,16 @@
 package org.jismah.servicios;
 
 import org.h2.tools.Server;
+import org.jismah.entidades.ProductImage;
 
+import java.io.File;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 public class BootStrapServices {
     private static BootStrapServices instance;
@@ -34,7 +42,47 @@ public class BootStrapServices {
         }
     }
 
-    public void init(){
+    public void init() {
         startDb();
+
+        // Creando 30 productos por default
+//        List<ProductImage> images = new ArrayList<>();
+//
+//        String encodedString = null;
+//        try {
+//            byte[] bytes = Files.readAllBytes(Paths.get("/public/image.jpg"));
+//            encodedString = Base64.getEncoder().encodeToString(bytes);
+//        } catch (Exception e) {
+//            System.err.println(e.getMessage());
+//        }
+//
+//        images.add(ProductServices.getInstance().newImage("image/jpeg", encodedString));
+//        for (int i = 0; i < 30; i++) {
+//            ProductServices.getInstance().newProduct("Producto #" + "i", new BigDecimal(9.99),
+//                    "Descripcion del producto", images);
+//        }
+
+        List<ProductImage> images = new ArrayList<>();
+        String currentPath = new File("").getAbsolutePath();
+        String imagePath = currentPath + "/src/main/resources/public/image.jpg";
+
+        for (int i = 0; i < 30; i++) {
+            String encodedString = null;
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(imagePath));
+                encodedString = Base64.getEncoder().encodeToString(bytes);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+            images.add(ProductServices.getInstance().newImage("image/jpeg", encodedString));
+        }
+
+        for (int i = 0; i < 30; i++) {
+            List<ProductImage> productImages = new ArrayList<>();
+            productImages.add(images.get(i));
+            ProductServices.getInstance().newProduct("Producto #" + (i+1), new BigDecimal(9.99),
+                    "Descripcion del producto", productImages);
+        }
+
     }
 }
