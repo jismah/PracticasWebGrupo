@@ -1,9 +1,7 @@
 package org.jismah;
 
-import org.jismah.entidades.Cart;
-import org.jismah.entidades.Product;
-import org.jismah.entidades.Sale;
-import org.jismah.entidades.User;
+import org.jismah.entidades.*;
+import org.jismah.servicios.CommentServices;
 import org.jismah.servicios.ProductServices;
 import org.jismah.servicios.SaleServices;
 import org.jismah.servicios.UserServices;
@@ -71,10 +69,6 @@ public class Core {
 
 
     //Manejo de Productos
-    public void addProduct(String name, BigDecimal price, String description) {
-        ProductServices.getInstance().newProduct(name, price, description);
-    }
-
     public void editProduct(UUID id, String name, BigDecimal price, String description) {
         Product product = getProductById(id);
         if (product != null) {
@@ -165,4 +159,24 @@ public class Core {
         cart.clearCart();
     }
 
+    public Comment getCommentById(Product product, String commentId) {
+        for (Comment comment : product.getComments()) {
+            if (comment.getId().equals(commentId)) {
+                return comment;
+            }
+        }
+        return null;
+    }
+
+    public void deleteComment(UUID productId, String commentId) {
+        Product product = getProductById(productId);
+        Comment comment = getCommentById(product, commentId);
+        product.removeComment(comment);
+        CommentServices.getInstance().delete(commentId);
+    }
+
+    public void addComment(UUID productId, String comment, User user) {
+        Product product = getProductById(productId);
+        product.addComment((Comment) CommentServices.getInstance().create(new Comment(user, comment, product)));
+    }
 }

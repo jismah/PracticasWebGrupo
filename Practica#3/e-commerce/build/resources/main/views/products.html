@@ -33,7 +33,7 @@
             </thead>
             <tbody>
             <tr th:each="p : ${products}">
-                <td th:text="${p.getName()}"></td>
+                <td><a th:href="${'/product?id=' + p.getId()}" th:text="${p.getName()}"></a></td>
                 <td th:text="${p.getPrice()}"></td>
                 <td>
                     <form action="/add-to-cart" method="post">

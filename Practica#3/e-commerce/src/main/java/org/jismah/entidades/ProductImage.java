@@ -3,6 +3,7 @@ package org.jismah.entidades;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 
 import java.io.Serializable;
 
@@ -13,6 +14,7 @@ public class ProductImage implements Serializable {
     @GeneratedValue
     private Long id;
     private String mimeType;
+    @Lob
     private String image;
 
     public ProductImage(String mimeType, String image) {

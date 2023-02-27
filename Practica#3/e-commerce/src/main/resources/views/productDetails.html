@@ -9,11 +9,11 @@
 <body>
 <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
 
-<form th:if="${product == null}" action="/product/new" method="post">
+<form th:if="${product == null}" action="/product/new" method="post" enctype="multipart/form-data">
     Nombre: <input type="text" name="name" required/><br>
-    Precio: <input type="number" name="price" min="0" step="any"required/><br/>
-    Descripción: <textarea name="description"></textarea><br/>
-    Imagenes: <input type="file" name="images" multiple required><br/>
+    Precio: <input type="number" name="price" min="0" step="any" required/><br/>
+    Descripcion: <textarea name="description"></textarea><br/>
+    Imagenes: <input type="file" name="images" accept="image/*" multiple required><br/>
     <input type="submit" value="Crear"/>
 </form>
 <form th:if="${product != null}" action="/product/edit" method="post">
@@ -21,7 +21,7 @@
     Nombre: <input type="text" name="name" th:value="${product.getName()}" required/><br>
     Precio: <input type="number" name="price" min="0" step="any" th:value="${product.getPrice()}" required/><br/>
     Descripción: <textarea name="description" th:text="${product.getDescription()}"></textarea><br/>
-    Imagenes: <input type="file" name="images" multiple><br/>
+    Imagenes: <input type="file" name="images" accept="image/*" multiple><br/>
     <input type="submit" value="Editar"/>
 </form>
 

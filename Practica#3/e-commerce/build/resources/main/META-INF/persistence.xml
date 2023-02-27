@@ -7,6 +7,7 @@
         <class>org.jismah.entidades.Sale</class>
         <class>org.jismah.entidades.SaleItem</class>
         <class>org.jismah.entidades.ProductImage</class>
+        <class>org.jismah.entidades.Comment</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/ormjpa" />

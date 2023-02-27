@@ -7,16 +7,15 @@ import io.javalin.rendering.JavalinRenderer;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import org.jismah.Core;
 import org.jismah.entidades.Product;
+import org.jismah.entidades.ProductImage;
 import org.jismah.entidades.User;
+import org.jismah.servicios.CommentServices;
 import org.jismah.servicios.ProductServices;
 import org.jismah.util.BaseHandler;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TemplateHandler extends BaseHandler {
 
@@ -154,8 +153,15 @@ public class TemplateHandler extends BaseHandler {
                     String username = ctx.queryParam("username");
 
                     Map<String, Object> model = getViewModel(sessionId);
-                    model.put("user", Core.getInstance().getUserByUsername(username));
-                    ctx.render("/views/userDetails.html", model);
+                    User user = Core.getInstance().getUserByUsername(username);
+                    if (user != null) {
+                        model.put("user", user);
+                        ctx.render("/views/userDetails.html", model);
+                    } else {
+                        model.put("message", "Usuario no encontrado");
+                        model.put("return", "/products");
+                        ctx.render("/views/messages.html", model);
+                    }
                 } else {
                     ctx.redirect("/");
                 }
@@ -242,6 +248,25 @@ public class TemplateHandler extends BaseHandler {
             });
 
             // CRUD de Productos
+            Handler productHandler = ctx -> {
+                String sessionId = getSessionId(ctx);
+                UUID id = UUID.fromString(ctx.queryParam("id"));
+
+                Map<String, Object> model = getViewModel(sessionId);
+                Product product = Core.getInstance().getProductById(id);
+
+                if (product != null) {
+                    model.put("product", product);
+                    model.put("comments", CommentServices.getInstance().getCommentsOfProduct(product));
+                    ctx.render("/views/product.html", model);
+                } else {
+                    model.put("message", "Producto no encontrado");
+                    model.put("return", "/products");
+                    ctx.render("/views/messages.html", model);
+                }
+            };
+            app.get("/product", productHandler);
+
             Handler productListHandler = ctx -> {
                 String sessionId = getSessionId(ctx);
 
@@ -277,16 +302,18 @@ public class TemplateHandler extends BaseHandler {
                         model.put("return", "/product/new");
                         ctx.render("/views/messages.html", model);
                     } else {
-                        Product product = ProductServices.getInstance().newProduct(name, price, description);
+                        List<ProductImage> images = new ArrayList<>();
                         ctx.uploadedFiles("images").forEach(uploadedFile -> {
                             try {
                                 byte[] bytes = uploadedFile.content().readAllBytes();
                                 String encodedString = Base64.getEncoder().encodeToString(bytes);
-                                ProductServices.getInstance().addImageToProduct(product.getId(), uploadedFile.contentType(), encodedString);
+                                images.add(ProductServices.getInstance().newImage(uploadedFile.contentType(), encodedString));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         });
+
+                        ProductServices.getInstance().newProduct(name, price, description, images);
                         ctx.redirect("/products");
                     }
                 }
@@ -298,8 +325,15 @@ public class TemplateHandler extends BaseHandler {
                     UUID id = UUID.fromString(ctx.queryParam("id"));
 
                     Map<String, Object> model = getViewModel(sessionId);
-                    model.put("product", Core.getInstance().getProductById(id));
-                    ctx.render("/views/productDetails.html", model);
+                    Product product = Core.getInstance().getProductById(id);
+                    if (product != null) {
+                        model.put("product", product);
+                        ctx.render("/views/productDetails.html", model);
+                    } else {
+                        model.put("message", "Producto no encontrado");
+                        model.put("return", "/products");
+                        ctx.render("/views/messages.html", model);
+                    }
                 } else {
                     ctx.redirect("/");
                 }
@@ -338,6 +372,38 @@ public class TemplateHandler extends BaseHandler {
 
                     Core.getInstance().deleteProduct(Core.getInstance().getProductById(id));
                     ctx.redirect("/products");
+                }
+            });
+
+            // Comentarios
+
+            app.post("/comment/new", new Handler() {
+                @Override
+                public void handle(Context ctx) throws Exception {
+                    if (loggedUser != null) {
+                        UUID productId = UUID.fromString(ctx.formParam("productId"));
+                        String comment = ctx.formParam("comment");
+
+                        Core.getInstance().addComment(productId, comment, loggedUser);
+                        ctx.redirect("/product?id=" + productId.toString());
+                    } else {
+                        String sessionId = getSessionId(ctx);
+                        Map<String, Object> model = getViewModel(sessionId);
+                        model.put("message", "Debe acceder a una cuenta para publicar un comentario");
+                        model.put("return", "/products");
+                        ctx.render("/views/messages.html", model);
+                    }
+                }
+            });
+
+            app.post("/comment/delete", new Handler() {
+                @Override
+                public void handle(Context ctx) throws Exception {
+                    UUID productId = UUID.fromString(ctx.formParam("productId"));
+                    String commentId = ctx.formParam("commentId");
+
+                    Core.getInstance().deleteComment(productId, commentId);
+                    ctx.redirect("/product?id=" + productId.toString());
                 }
             });
 

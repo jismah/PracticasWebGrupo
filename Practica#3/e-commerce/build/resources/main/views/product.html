@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.getName()}">Producto</title>
+
+    <link rel="stylesheet" href="/base.css">
+</head>
+<body>
+<div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+
+<h1 th:text="${product.getName()}">Producto</h1>
+<div>
+    <h4 th:text="${'$' + product.getPrice()}">$0.00</h4>
+    <p th:text="${product.getDescription()}">Descripcion</p>
+</div>
+<div>
+    <div th:each="foto : ${product.getImages()}">
+        <img th:src="${foto.getSource()}"/>
+    </div>
+</div>
+<div>
+    <form th:if="${isLogged}" action="/comment/new" method="post">
+        <input type="hidden" name="productId" th:value="${product.getId()}">
+        Comentario: <textarea name="comment"></textarea><br/>
+        <input type="submit" value="Publicar"/>
+    </form>
+    <h4 th:if="${isLogged == false}">Debe acceder a una cuenta para poder comentar. <a href="/login">Login</a></h4>
+</div>
+<div>
+    <div th:each="comment : ${comments}">
+        <label th:text="${comment.getUser().getUsername()}">Usuario</label>
+        <p th:text="${comment.getComment()}">Comentario</p>
+
+        <form th:if="${isAdmin}" action="/comment/delete" method="post">
+            <input type="hidden" name="productId" th:value="${product.getId()}">
+            <input type="hidden" name="commentId" th:value="${comment.getId()}">
+            <button type="submit">Borrar</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
