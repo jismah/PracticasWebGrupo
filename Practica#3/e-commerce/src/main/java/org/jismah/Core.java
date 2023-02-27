@@ -90,6 +90,9 @@ public class Core {
     }
 
     public void deleteProduct(Product product) {
+        for (Comment comment : CommentServices.getInstance().getCommentsOfProduct(product)) {
+            CommentServices.getInstance().delete(comment.getId());
+        }
         ProductServices.getInstance().delete(product.getId());
     }
 
