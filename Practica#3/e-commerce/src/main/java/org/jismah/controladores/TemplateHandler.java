@@ -15,6 +15,7 @@ import org.jismah.util.BaseHandler;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.*;
 
 public class TemplateHandler extends BaseHandler {
@@ -38,6 +39,13 @@ public class TemplateHandler extends BaseHandler {
     public void aplicarRutas() {
         app.routes(() -> {
 
+            app.before("/remember", ctx -> {
+                String rememberMe = ctx.cookie("rememberMe");
+                if (rememberMe != null && rememberMe.equals("true")) {
+                    ctx.result("Cookie de remember es: " + rememberMe);
+                }
+            });
+            
             app.get("/", ctx -> {
                 String sessionId = getSessionId(ctx);
                 if (isAdmin(sessionId)) {
@@ -67,10 +75,14 @@ public class TemplateHandler extends BaseHandler {
                 public void handle(Context ctx) throws Exception {
                     String username = ctx.formParam("username");
                     String password = ctx.formParam("password");
+                    boolean remember = Boolean.parseBoolean(ctx.formParam("remember"));
 
                     if (ADMIN_USERNAME.equals(username) && ADMIN_PASSWORD.equals(password)) {
                         String sessionId = getSessionId(ctx);
                         ADMIN_SESSIONS.put(sessionId, true);
+                        if (remember) {
+//                            ctx.cookie("rememberMe");
+                        }
                         ctx.cookie(SESSION_ID_KEY, sessionId);
                         ctx.redirect("/");
                     } else if (Core.getInstance().authenticateUser(username, password)) {
@@ -272,6 +284,14 @@ public class TemplateHandler extends BaseHandler {
 
                 Map<String, Object> model = getViewModel(sessionId);
                 model.put("products", Core.getInstance().getAllProducts());
+                int pageNum = Core.getInstance().getAllProducts().size() / 10;
+
+                if (pageNum <= 1) {
+                    pageNum = 1;
+                    model.put("products_cant", pageNum);
+                    ctx.render("/views/products.html", model);
+                }
+                model.put("products_cant", pageNum);
                 ctx.render("/views/products.html", model);
             };
             app.get("/products", productListHandler);

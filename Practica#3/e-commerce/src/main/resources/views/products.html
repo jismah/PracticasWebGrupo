@@ -35,23 +35,27 @@
             <tr th:each="p : ${products}">
                 <td><a th:href="${'/product?id=' + p.getId()}" th:text="${p.getName()}"></a></td>
                 <td th:text="${p.getPrice()}"></td>
-                <td>
+
                     <form action="/add-to-cart" method="post">
-                        <input type="hidden" name="id" th:value="${p.getId()}">
-                        <input type="number" name="cant" min="1" value="1">
-                        <button type="submit">Agregar al Carrito</button>
+                        <td>
+                            <input type="hidden" name="id" th:value="${p.getId()}">
+                            <input class="form-control" type="number" name="cant" min="1" value="1">
+                        </td>
+                        <td>
+                            <button class="btn btn-outline-dark" type="submit">Agregar al Carrito</button>
+                        </td>
                     </form>
-                </td>
+
                 <td>
                     <form th:if="${isAdmin}" action="/product/edit" method="get">
                         <input type="hidden" name="id" th:value="${p.getId()}">
-                        <button type="submit">Editar</button>
+                        <button class="btn btn-outline-primary" type="submit">Editar</button>
                     </form>
                 </td>
                 <td>
                     <form th:if="${isAdmin}" action="/product/delete" method="post">
                         <input type="hidden" name="id" th:value="${p.getId()}">
-                        <button type="submit">Eliminar</button>
+                        <button class="btn btn-outline-danger" type="submit">Eliminar</button>
                     </form>
                 </td>
             </tr>
@@ -59,6 +63,24 @@
         </table>
     </div>
 
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-end">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+    <div>
+        <a th:if="${products_cant > 1}">Anterior</a>
+        <span th:text="${products_cant}"></span>
+        <a th:if="${products_cant}">Siguiente</a>
+    </div>
 
 </div>
 

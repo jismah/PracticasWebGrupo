@@ -18,7 +18,7 @@
         <h1 class="title-module">Listado de Usuarios</h1>
         <a class="ms-3 btn btn-outline-dark" href="/user/new">Nuevo Usuario</a>
     </div>
-</div>
+
 
 <div class="container-datatable">
     <table class="table table-striped">
@@ -26,7 +26,7 @@
         <tr>
             <th scope="col">Nombre</th>
             <th scope="col">Username</th>
-            <th scope="col"></th>
+            <th scope="col">Acciones</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -38,14 +38,14 @@
             <td>
                 <form action="/user/edit" method="get">
                     <input type="hidden" name="username" th:value="${u.getUsername()}">
-                    <button class="btn btn-outline" type="submit">Editar</button>
+                    <button class="btn btn-outline-dark" type="submit">Editar</button>
                 </form>
             </td>
 
             <td>
                 <form action="/user/delete" method="post">
                     <input type="hidden" name="username" th:value="${u.getUsername()}">
-                    <button class="btn btn-outline" type="submit">Delete</button>
+                    <button class="btn btn-outline-dark" type="submit">Delete</button>
                 </form>
             </td>
 
@@ -54,7 +54,7 @@
     </table>
 
 </div>
-
+</div>
 </body>
 
 </html>
