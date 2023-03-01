@@ -7,6 +7,7 @@ import org.jismah.entidades.Product;
 import org.jismah.entidades.ProductImage;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,4 +72,36 @@ public class ProductServices extends GestionBD<Product> {
         Product product = getProductById(id);
         product.removeImages();
     }
+
+    public Long getProductCount() {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("select count(*) from Product");
+        try {
+            return (Long) query.getSingleResult();
+        } catch (NoResultException e) {
+            return 0L;
+        }
+    }
+
+    public List<Product> getProductsByPage(int pageNumber) {
+        int startIndex = (pageNumber - 1) * 10;
+        int maxResults = 10;
+        long productCount = getProductCount();
+
+        if (startIndex >= productCount) {
+            return new ArrayList<>();
+        }
+
+        if (startIndex + maxResults > productCount) {
+            maxResults = (int) (productCount - startIndex);
+        }
+
+        EntityManager em = getEntityManager();
+        Query query = em.createNativeQuery("select * from Product LIMIT :maxResults OFFSET :startIndex", Product.class);
+        query.setParameter("maxResults", maxResults);
+        query.setParameter("startIndex", startIndex);
+
+        return query.getResultList();
+    }
+
 }

@@ -15,7 +15,6 @@ import org.jismah.util.BaseHandler;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.*;
 
 public class TemplateHandler extends BaseHandler {
@@ -282,16 +281,26 @@ public class TemplateHandler extends BaseHandler {
             Handler productListHandler = ctx -> {
                 String sessionId = getSessionId(ctx);
 
+                String pageParam = ctx.queryParam("page");
+                int currentPage;
+
+                if (pageParam == null || pageParam.isEmpty()) {
+                    currentPage = 1;
+                } else {
+                    currentPage = Integer.parseInt(pageParam);
+                }
+
                 Map<String, Object> model = getViewModel(sessionId);
-                model.put("products", Core.getInstance().getAllProducts());
-                int pageNum = Core.getInstance().getAllProducts().size() / 10;
+                model.put("products", ProductServices.getInstance().getProductsByPage(currentPage));
+
+                int pageNum = (int) Math.ceil((double) ProductServices.getInstance().getProductCount() / 10);
 
                 if (pageNum <= 1) {
                     pageNum = 1;
-                    model.put("products_cant", pageNum);
-                    ctx.render("/views/products.html", model);
                 }
-                model.put("products_cant", pageNum);
+                model.put("page_cant", pageNum);
+                model.put("current_page", currentPage);
+                model.put("next_page", currentPage + 1);
                 ctx.render("/views/products.html", model);
             };
             app.get("/products", productListHandler);
