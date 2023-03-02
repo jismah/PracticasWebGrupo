@@ -1,10 +1,7 @@
 package org.jismah;
 
 import org.jismah.entidades.*;
-import org.jismah.servicios.CommentServices;
-import org.jismah.servicios.ProductServices;
-import org.jismah.servicios.SaleServices;
-import org.jismah.servicios.UserServices;
+import org.jismah.servicios.*;
 
 import java.math.BigDecimal;
 import java.util.*;

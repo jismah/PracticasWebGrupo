@@ -44,23 +44,9 @@ public class BootStrapServices {
 
     public void init() {
         startDb();
+        CockroachServices.getInstance().StartDB();
 
         // Creando 30 productos por default
-//        List<ProductImage> images = new ArrayList<>();
-//
-//        String encodedString = null;
-//        try {
-//            byte[] bytes = Files.readAllBytes(Paths.get("/public/image.jpg"));
-//            encodedString = Base64.getEncoder().encodeToString(bytes);
-//        } catch (Exception e) {
-//            System.err.println(e.getMessage());
-//        }
-//
-//        images.add(ProductServices.getInstance().newImage("image/jpeg", encodedString));
-//        for (int i = 0; i < 30; i++) {
-//            ProductServices.getInstance().newProduct("Producto #" + "i", new BigDecimal(9.99),
-//                    "Descripcion del producto", images);
-//        }
 
         List<ProductImage> images = new ArrayList<>();
         String currentPath = new File("").getAbsolutePath();

@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.jismah.entidades.Sale;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +25,16 @@ public class SaleServices extends GestionBD<Sale> {
     }
 
     public void newSale(String clientName, Map<UUID, Integer> items) {
-        create(new Sale(clientName, items));
+        Sale sale = new Sale(clientName, items);
+        create(sale);
+        try {
+            CockroachServices.getInstance().insertSale(sale);
+            System.out.println("\nCockroachDB - Informacion en tablas: ");
+            CockroachServices.getInstance().displayAllSales();
+            System.out.println("\n");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<Sale> getSales() {

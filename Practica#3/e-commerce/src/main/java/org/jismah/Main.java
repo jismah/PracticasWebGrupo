@@ -4,6 +4,9 @@ import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.jismah.controladores.TemplateHandler;
 import org.jismah.servicios.BootStrapServices;
+import org.jismah.servicios.CockroachServices;
+
+import java.sql.SQLException;
 
 public class Main {
 
@@ -31,5 +34,14 @@ public class Main {
 
         //Manejadores de Envio de DATA
         //new Handlers(app).aplicarRutas();
+
+        //Display de contenido en CockroachDB
+        try {
+            System.out.println("\nCockroachDB - Informacion en tablas: ");
+            CockroachServices.getInstance().displayAllSales();
+            System.out.println("\n");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
