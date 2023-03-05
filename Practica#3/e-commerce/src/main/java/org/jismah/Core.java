@@ -53,15 +53,15 @@ public class Core {
         return UserServices.getInstance().getUserByUsername(username);
     }
 
-    public boolean authenticateUser(String username, String password) {
+    public User authenticateUser(String username, String password) {
         User user = getUserByUsername(username);
         if (user == null) {
-            return false;
+            return null;
         }
         if (user.getPassword().equals(password)) {
-            return true;
+            return user;
         }
-        return false;
+        return null;
     }
 
 

@@ -12,6 +12,11 @@
     outline: none;
 }
 
+.cart-image {
+    width: 100px;
+    object-fit: contain;
+}
+
 .selected {
     font-weight: 800;
 }

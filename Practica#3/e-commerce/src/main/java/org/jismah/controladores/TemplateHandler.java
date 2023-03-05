@@ -8,13 +8,16 @@ import io.javalin.rendering.template.JavalinThymeleaf;
 import org.jismah.Core;
 import org.jismah.entidades.Product;
 import org.jismah.entidades.ProductImage;
+import org.jismah.entidades.Session;
 import org.jismah.entidades.User;
 import org.jismah.servicios.CommentServices;
 import org.jismah.servicios.ProductServices;
+import org.jismah.servicios.SessionServices;
 import org.jismah.util.BaseHandler;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.*;
 
 public class TemplateHandler extends BaseHandler {
@@ -22,8 +25,7 @@ public class TemplateHandler extends BaseHandler {
     private static final String ADMIN_USERNAME = "admin";
     private static final String ADMIN_PASSWORD = "admin";
     private static final String SESSION_ID_KEY = "session-id";
-    private static final Map<String, Boolean> ADMIN_SESSIONS = new HashMap<>();
-    private static final Map<String, Boolean> SESSIONS = new HashMap<>();
+    private static final String REMEMBER_ID_KEY = "rememberMe";
     private static User loggedUser = null;
 
     public TemplateHandler(Javalin app) {
@@ -38,23 +40,36 @@ public class TemplateHandler extends BaseHandler {
     public void aplicarRutas() {
         app.routes(() -> {
 
-            app.before("/remember", ctx -> {
-                String rememberMe = ctx.cookie("rememberMe");
-                if (rememberMe != null && rememberMe.equals("true")) {
-                    ctx.result("Cookie de remember es: " + rememberMe);
+            app.get("/remember", ctx -> {
+                String rememberMe = ctx.cookie(REMEMBER_ID_KEY);
+                if (rememberMe != null) {
+                    ctx.result("Cookie de remember es: " + rememberMe +"\nSession-id: " + ctx.cookie(SESSION_ID_KEY));
+                } else {
+                    ctx.result("No se tiene cookie de remember");
                 }
+            });
+
+            app.get("/sessions", ctx -> {
+                List<Session> sessions = SessionServices.getInstance().findAll();
+                String res = "";
+                for (Session session : sessions) {
+                    res += "\n\nID: " + session.getSessionId() + "\nUsername: " + session.getUsername();
+                }
+                ctx.result(res);
             });
             
             app.get("/", ctx -> {
                 String sessionId = getSessionId(ctx);
+
+                System.out.println("isAdmin: " + isAdmin(sessionId));
                 if (isAdmin(sessionId)) {
                     Map<String, Object> model = getViewModel(sessionId);
                     model.put("message", "Hola Admin, " + sessionId);
                     ctx.render("/views/messages.html", model);
 
-                } else if (isLoggedInSession(sessionId)) {
+                } else if (isLoggedInSession(sessionId) != null) {
                     Map<String, Object> model = getViewModel(sessionId);
-                    model.put("message", "Hola " + loggedUser.getName() + ",/nSession Id:" + sessionId);
+                    model.put("message", "Hola " + loggedUser.getName() + ",\nSession Id:" + sessionId);
                     ctx.render("/views/messages.html", model);
                 } else {
                     ctx.redirect("/products");
@@ -63,8 +78,22 @@ public class TemplateHandler extends BaseHandler {
 
             // Logins y registro de usuarios nuevos
             app.get("/login", ctx -> {
-                String sessionId = getSessionId(ctx);
 
+                String cookieString = ctx.cookie(REMEMBER_ID_KEY);
+                if (cookieString != null) {
+
+                    Session session = SessionServices.getInstance().find(cookieString);
+                    if (session != null) {
+                        if (session.getUsername().equals(ADMIN_USERNAME)) {
+                            loggedUser = Core.getInstance().getUserByUsername(session.getUsername());
+                        }
+                        ctx.cookie(SESSION_ID_KEY, cookieString);
+                        ctx.redirect("/");
+                        return;
+                    }
+                }
+
+                String sessionId = getSessionId(ctx);
                 Map<String, Object> model = getViewModel(sessionId);
                 ctx.render("/views/login.html", model);
             });
@@ -76,42 +105,45 @@ public class TemplateHandler extends BaseHandler {
                     String password = ctx.formParam("password");
                     boolean remember = Boolean.parseBoolean(ctx.formParam("remember"));
 
+                    User user;
                     if (ADMIN_USERNAME.equals(username) && ADMIN_PASSWORD.equals(password)) {
                         String sessionId = getSessionId(ctx);
-                        ADMIN_SESSIONS.put(sessionId, true);
+                        SessionServices.getInstance().create(new Session(sessionId, ADMIN_USERNAME));
                         if (remember) {
-//                            ctx.cookie("rememberMe");
+                            ctx.cookie(REMEMBER_ID_KEY, sessionId, (int) Duration.ofDays(7).getSeconds());
                         }
-                        ctx.cookie(SESSION_ID_KEY, sessionId);
-                        ctx.redirect("/");
-                    } else if (Core.getInstance().authenticateUser(username, password)) {
-                        String sessionId = getSessionId(ctx);
-                        SESSIONS.put(sessionId, true);
-                        loggedUser = Core.getInstance().getUserByUsername(username);
-
-                        ctx.cookie(SESSION_ID_KEY, sessionId);
-                        ctx.redirect("/");
                     } else {
-                        ctx.status(401);
-                        String sessionId = getSessionId(ctx);
-
-                        Map<String, Object> model = getViewModel(sessionId);
-                        model.put("message", "Nombre o clave incorrecta");
-                        model.put("return", "/login");
-                        ctx.render("/views/messages.html", model);
+                        user = Core.getInstance().authenticateUser(username, password);
+                        if (user != null) {
+                            String sessionId = getSessionId(ctx);
+                            SessionServices.getInstance().create(new Session(sessionId, username));
+                            loggedUser = user;
+                            if (remember) {
+                                ctx.cookie(REMEMBER_ID_KEY, sessionId, (int) Duration.ofDays(7).getSeconds());
+                            }
+                        } else {
+                            ctx.status(401);
+                            Map<String, Object> model = getViewModel(getSessionId(ctx));
+                            model.put("message", "Nombre o clave incorrecta");
+                            model.put("return", "/login");
+                            ctx.render("/views/messages.html", model);
+                            return;
+                        }
                     }
+
+                    String sessionId = getSessionId(ctx);
+                    ctx.cookie(SESSION_ID_KEY, sessionId);
+                    ctx.redirect("/");
                 }
             });
 
             app.get("/logout", ctx -> {
                 String sessionId = getSessionId(ctx);
-                if (ADMIN_SESSIONS.containsKey(sessionId)) {
-                    ADMIN_SESSIONS.remove(sessionId);
-                    ctx.removeCookie(SESSION_ID_KEY);
-                } else {
-                    SESSIONS.remove(sessionId);
-                    ctx.removeCookie(SESSION_ID_KEY);
-                }
+
+                SessionServices.getInstance().delete(sessionId);
+
+                ctx.removeCookie(SESSION_ID_KEY);
+                ctx.removeCookie(REMEMBER_ID_KEY);
                 loggedUser = null;
                 ctx.redirect("/login");
             });
@@ -414,7 +446,7 @@ public class TemplateHandler extends BaseHandler {
                         String comment = ctx.formParam("comment");
 
                         Core.getInstance().addComment(productId, comment, loggedUser);
-                        ctx.redirect("/product?id=" + productId.toString());
+                        ctx.redirect("/product?id=" + productId);
                     } else {
                         String sessionId = getSessionId(ctx);
                         Map<String, Object> model = getViewModel(sessionId);
@@ -432,7 +464,7 @@ public class TemplateHandler extends BaseHandler {
                     String commentId = ctx.formParam("commentId");
 
                     Core.getInstance().deleteComment(productId, commentId);
-                    ctx.redirect("/product?id=" + productId.toString());
+                    ctx.redirect("/product?id=" + productId);
                 }
             });
 
@@ -489,8 +521,13 @@ public class TemplateHandler extends BaseHandler {
     }
 
 
-    private static boolean isLoggedInSession(String sessionId) {
-        return SESSIONS.getOrDefault(sessionId, false);
+    private static User isLoggedInSession(String sessionId) {
+        Session session = SessionServices.getInstance().find(sessionId);
+        if (session == null) {
+            return null;
+        }
+        loggedUser = Core.getInstance().getUserByUsername(session.getUsername());
+        return loggedUser;
     }
 
     private static String generateSessionId() {
@@ -507,13 +544,19 @@ public class TemplateHandler extends BaseHandler {
     }
 
     private static boolean isAdmin(String sessionId) {
-        return ADMIN_SESSIONS.getOrDefault(sessionId, false);
+        Session session = SessionServices.getInstance().find(sessionId);
+        if (session == null) {
+            System.out.println("Session is null");
+            return false;
+        }
+        System.out.println("Session exists");
+        return session.getUsername().equals(ADMIN_USERNAME);
     }
 
     private static Map<String, Object> getViewModel(String sessionId) {
         Map<String, Object> model = new HashMap<>();
         model.put("isAdmin", isAdmin(sessionId));
-        model.put("isLogged", loggedUser == null ? false : true);
+        model.put("isLogged", loggedUser != null);
         model.put("itemCount", Core.getInstance().getCartCountBySession(sessionId));
         return model;
     }

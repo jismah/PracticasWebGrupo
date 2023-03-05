@@ -1,6 +1,7 @@
 package org.jismah.servicios;
 
 import org.h2.tools.Server;
+import org.jismah.Core;
 import org.jismah.entidades.ProductImage;
 
 import java.io.File;
@@ -47,28 +48,29 @@ public class BootStrapServices {
         CockroachServices.getInstance().StartDB();
 
         // Creando 30 productos por default
+        int productCount = Core.getInstance().getAllProducts().size();
+        if (productCount < 30) {
+            List<ProductImage> images = new ArrayList<>();
+            String currentPath = new File("").getAbsolutePath();
+            String imagePath = currentPath + "/src/main/resources/public/image.jpg";
 
-        List<ProductImage> images = new ArrayList<>();
-        String currentPath = new File("").getAbsolutePath();
-        String imagePath = currentPath + "/src/main/resources/public/image.jpg";
-
-        for (int i = 0; i < 30; i++) {
-            String encodedString = null;
-            try {
-                byte[] bytes = Files.readAllBytes(Paths.get(imagePath));
-                encodedString = Base64.getEncoder().encodeToString(bytes);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
+            for (int i = 0; i < 30-productCount; i++) {
+                String encodedString = null;
+                try {
+                    byte[] bytes = Files.readAllBytes(Paths.get(imagePath));
+                    encodedString = Base64.getEncoder().encodeToString(bytes);
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+                images.add(ProductServices.getInstance().newImage("image/jpeg", encodedString));
             }
-            images.add(ProductServices.getInstance().newImage("image/jpeg", encodedString));
-        }
 
-        for (int i = 0; i < 30; i++) {
-            List<ProductImage> productImages = new ArrayList<>();
-            productImages.add(images.get(i));
-            ProductServices.getInstance().newProduct("Producto #" + (i+1), new BigDecimal(9.99),
-                    "Descripcion del producto", productImages);
+            for (int i = 0; i < 30-productCount; i++) {
+                List<ProductImage> productImages = new ArrayList<>();
+                productImages.add(images.get(i));
+                ProductServices.getInstance().newProduct("Producto #" + (productCount+i+1), new BigDecimal(9.99),
+                        "Descripcion del producto", productImages);
+            }
         }
-
     }
 }

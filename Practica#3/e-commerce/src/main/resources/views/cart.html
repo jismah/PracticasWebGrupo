@@ -22,6 +22,7 @@
         <table class="table table-striped">
         <thead>
         <tr>
+            <th scope="col">Foto</th>
             <th scope="col">Nombre</th>
             <th scope="col">Precio</th>
             <th scope="col">Cantidad</th>
@@ -33,6 +34,7 @@
         </thead>
         <tbody>
         <tr th:each="p : ${products}">
+            <td><img class="cart-image" th:src="${p.getImages().get(0).getSource()}" /></td>
             <td th:text="${p.getName()}"></td>
             <td th:text="${p.getPrice()}"></td>
             <td th:text="${'x' + items.getOrDefault(p.getId(), 'Error')}"></td>

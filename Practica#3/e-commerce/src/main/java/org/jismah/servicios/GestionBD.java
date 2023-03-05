@@ -88,7 +88,7 @@ public class GestionBD<T> {
         }
     }
 
-    public T find(Object id) throws PersistenceException {
+    public T find(String id) throws PersistenceException {
         EntityManager em = getEntityManager();
 
         try {
