@@ -11,7 +11,7 @@
 <body>
 <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
 
-<div class="container-fluid">
+<div style="margin-top: 20px;" class="container-fluid">
     <p th:text="${message}">No hay mensaje que mostrar</p>
     <a class="button" th:if="${return != null}" th:href="${return}">Regresar</a>
 </div>

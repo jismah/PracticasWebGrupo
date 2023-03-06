@@ -20,40 +20,40 @@
     </div>
 
 
-<div class="container-datatable">
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th scope="col">Nombre</th>
-            <th scope="col">Username</th>
-            <th scope="col">Acciones</th>
-            <th scope="col"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="u : ${users}">
-            <td th:text="${u.getName()}"></td>
-            <td th:text="${u.getUsername()}"></td>
+    <div class="container-datatable">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Username</th>
+                <th scope="col">Acciones</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td th:text="${u.getName()}"></td>
+                <td th:text="${u.getUsername()}"></td>
 
-            <td>
-                <form action="/user/edit" method="get">
-                    <input type="hidden" name="username" th:value="${u.getUsername()}">
-                    <button class="btn btn-outline-dark" type="submit">Editar</button>
-                </form>
-            </td>
+                <td>
+                    <form action="/user/edit" method="get">
+                        <input type="hidden" name="username" th:value="${u.getUsername()}">
+                        <button class="btn btn-outline-dark" type="submit">Editar</button>
+                    </form>
+                </td>
 
-            <td>
-                <form action="/user/delete" method="post">
-                    <input type="hidden" name="username" th:value="${u.getUsername()}">
-                    <button class="btn btn-outline-dark" type="submit">Delete</button>
-                </form>
-            </td>
+                <td>
+                    <form action="/user/delete" method="post">
+                        <input type="hidden" name="username" th:value="${u.getUsername()}">
+                        <button class="btn btn-outline-dark" type="submit">Delete</button>
+                    </form>
+                </td>
 
-        </tr>
-        </tbody>
-    </table>
+            </tr>
+            </tbody>
+        </table>
 
-</div>
+    </div>
 </div>
 </body>
 

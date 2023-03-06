@@ -4,40 +4,52 @@
     <meta charset="UTF-8">
     <title th:text="${product.getName()}">Producto</title>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="/base.css">
 </head>
 <body>
-<div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
+    <div th:insert="~{views/navbar.html :: navbar}" th:with="isAdmin=${isAdmin}, isLogged=${isLogged}, itemCount=${itemCount}"></div>
 
-<h1 th:text="${product.getName()}">Producto</h1>
-<div>
-    <h4 th:text="${'$' + product.getPrice()}">$0.00</h4>
-    <p th:text="${product.getDescription()}">Descripcion</p>
-</div>
-<div>
-    <div th:each="foto : ${product.getImages()}">
-        <img th:src="${foto.getSource()}"/>
-    </div>
-</div>
-<div>
-    <form th:if="${isLogged}" action="/comment/new" method="post">
-        <input type="hidden" name="productId" th:value="${product.getId()}">
-        Comentario: <textarea name="comment"></textarea><br/>
-        <input type="submit" value="Publicar"/>
-    </form>
-    <h4 th:if="${isLogged == false}">Debe acceder a una cuenta para poder comentar. <a href="/login">Login</a></h4>
-</div>
-<div>
-    <div th:each="comment : ${comments}">
-        <label th:text="${comment.getUser().getUsername()}">Usuario</label>
-        <p th:text="${comment.getComment()}">Comentario</p>
+    <div class="container-fluid px-5 pt-3">
+        <h1 class="title-module" th:text="${product.getName()}">Producto</h1>
+        <div>
+            <h4 class="sub-title" th:text="${'$' + product.getPrice()}">$0.00</h4>
+            <p th:text="${product.getDescription()}">Descripcion</p>
+        </div>
+        <div>
+            <div class="slider-images">
+                <div id="section-container" class="image-container">
+                    <div class="image-block" th:each="foto : ${product.getImages()}">
+                        <img th:src="${foto.getSource()}" loading="lazy" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 20px;">
+            <form th:if="${isLogged}" action="/comment/new" method="post">
+                <input type="hidden" name="productId" th:value="${product.getId()}">
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Comentario</label>
+                    <textarea style="max-width: 300px;" class="form-control" id="comment" name="comment"></textarea>
+                </div>
+                <input class="btn btn-outline-dark" type="submit" value="Publicar"/>
+            </form>
+            <p th:if="${isLogged == false}">Debe acceder a una cuenta para poder comentar. <a href="/login">Login</a></p>
+        </div>
+        <div>
+            <div class="comment-container" th:each="comment : ${comments}">
+                <label class="comment-username" th:text="${'Usuario: ' + comment.getUser().getUsername()}">Usuario</label>
+                <p th:text="${comment.getComment()}">Comentario</p>
 
-        <form th:if="${isAdmin}" action="/comment/delete" method="post">
-            <input type="hidden" name="productId" th:value="${product.getId()}">
-            <input type="hidden" name="commentId" th:value="${comment.getId()}">
-            <button type="submit">Borrar</button>
-        </form>
+                <form th:if="${isAdmin}" action="/comment/delete" method="post">
+                    <input type="hidden" name="productId" th:value="${product.getId()}">
+                    <input type="hidden" name="commentId" th:value="${comment.getId()}">
+                    <button class="btn btn-outline-dark" type="submit">Borrar</button>
+                </form>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
